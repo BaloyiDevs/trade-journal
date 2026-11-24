@@ -7,6 +7,10 @@ app.get("/health", (req: Request, res: Response) => {
     res.json({ status: "ok"});
 });
 
+app.get("/", (req: Request, res: Response) => {
+  res.json({ name: "trade-journal-api", status: "running" });
+});
+
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
