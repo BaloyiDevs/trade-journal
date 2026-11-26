@@ -1,3 +1,4 @@
+import { rateLimit } from "./rateLimit.js";
 import { randomBytes } from "node:crypto";
 import { redis } from "./redis.js";
 import { Router, type Request, type Response } from "express";
@@ -45,7 +46,10 @@ const signinSchema = z.object({
   password: z.string().min(1).max(128),
 });
 
-authRouter.post("/signin", async (req: Request, res: Response) => {
+authRouter.post(
+  "/signin",
+  rateLimit({ prefix: "signin", max: 5, windowSeconds: 15 * 60 }),
+  async (req: Request, res: Response) => {
   const parsed = signinSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Enter your email and password" });
@@ -104,7 +108,9 @@ authRouter.get("/me", async (req: Request, res: Response) => {
   res.json(result.rows[0]);
 });
 
-authRouter.post("/signout", async (req: Request, res: Response) => {
+authRouter.post("/signout",
+    rateLimit({ prefix: "signup", max: 10, windowSeconds: 60 * 60 }),
+     async (req: Request, res: Response) => {
   const sessionId = req.cookies?.[SESSION_COOKIE];
   if (sessionId) {
     await redis.del(`session:${sessionId}`);
