@@ -1,9 +1,11 @@
+import cookieParser from "cookie-parser";
 import { authRouter } from "./auth.js";
 import express, {type Request, type Response } from "express";
 import { pool } from "./db.js";
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use("/auth", authRouter);
 const port = process.env.PORT ?? 3000;
 
